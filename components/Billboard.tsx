@@ -1,7 +1,8 @@
-import React from "react"; // import the React library from node_modules
+import React, { useCallback } from "react"; // import the React library from node_modules
 import useBillboard from "@/hooks/useBillboard"; // import a custom hook called `useBillboard` from an alias path (`@/../src/`)
 import { AiOutlineInfoCircle } from "react-icons/ai"; // import an icon component from the 'react-icons/ai' library
 import PlayButton from "./PlayButton";
+import useInfoModal from "@/hooks/useInfoModal";
 
 /* 
   This is a functional component called 'Billboard'.
@@ -9,6 +10,11 @@ import PlayButton from "./PlayButton";
 */
 const Billboard = () => {
   const { data } = useBillboard(); // retrieve `data` from the API using the `useBillboard` custom hook
+  const { openModal } = useInfoModal();
+
+  const handleOpenModal = useCallback(() => {
+    openModal(data?.id);
+  }, [openModal, data?.id]);
 
   return (
     <div className="relative h-[56.25vw]">
@@ -36,7 +42,10 @@ const Billboard = () => {
           {" "}
           <PlayButton movieId={data?.id} />
           {/* container for the More Info button with spacing between its children */}
-          <button className="bg-white text-white bg-opacity-30 rounded-md py-1 md:py-2 px-2 md:px-4 w-auto text-xs lg:text-lg font-semibold flex flex-row items-center hover:bg-opacity-20 transition">
+          <button
+            onClick={handleOpenModal}
+            className="bg-white text-white bg-opacity-30 rounded-md py-1 md:py-2 px-2 md:px-4 w-auto text-xs lg:text-lg font-semibold flex flex-row items-center hover:bg-opacity-20 transition"
+          >
             {" "}
             {/* stylized button to show more information about the video */}
             <AiOutlineInfoCircle className="mr-1" />{" "}
