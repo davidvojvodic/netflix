@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { NextPageContext } from "next";
 import axios from "axios";
 import { signIn, getSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 // Icon imports
 import { FcGoogle } from "react-icons/fc";
@@ -28,6 +29,8 @@ export async function getServerSideProps(context: NextPageContext) {
 
 // Define component: Auth
 const Auth = () => {
+  const router = useRouter();
+
   // Define state variables
   const [email, setEmail] = useState(""); // Email input
   const [name, setName] = useState(""); // Name input
@@ -48,12 +51,14 @@ const Auth = () => {
       await signIn("credentials", {
         email,
         password,
-        callbackUrl: "/profiles",
+        redirect: false,
+        callbackUrl: "/",
       });
+      router.push("/profiles");
     } catch (error) {
       console.log(error);
     }
-  }, [email, password]);
+  }, [email, password, router]);
 
   // Register user
   const register = useCallback(async () => {
