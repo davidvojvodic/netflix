@@ -7,12 +7,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   // Exporting an asynchronous handler function that receives a request of type NextApiRequest and a response of type NextApiResponse
-  if (req.method !== "POST") {
-    // Verify whether the HTTP Method informed is POST
-    return res.status(405).end(); // Return an HTTP 405 error message if its any other method than POST
-  }
 
   try {
+    if (req.method !== "POST") {
+      // Verify whether the HTTP Method informed is POST
+      return res.status(405).end(); // Return an HTTP 405 error message if its any other method than POST
+    }
+
     const { email, name, password } = req.body; // Destructuring the request body as objects and retrieving its attributes
 
     const existingUser = await prismadb.user.findUnique({
