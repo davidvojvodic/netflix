@@ -1,12 +1,30 @@
 // Import the necessary libraries and components
 import Input from "@/components/Input";
 import React, { useState, useCallback } from "react";
+import { NextPageContext } from "next";
 import axios from "axios";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 
 // Icon imports
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+
+export async function getServerSideProps(context: NextPageContext) {
+  const session = await getSession(context);
+
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+}
 
 // Define component: Auth
 const Auth = () => {
