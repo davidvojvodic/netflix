@@ -1,0 +1,83 @@
+// This is your Prisma schema file.
+// It defines the data model and schema to use for MongoDB with Prisma
+
+// The generator block specifies the client 
+// that will be used to query the MongoDB database
+generator client {
+  provider = "prisma-client-js"
+}
+
+// The datasource block specifies the connection details 
+// for the database.
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// The User model defines the schema for user data.
+model User {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId // Specifies that '_id' field from MongoDB is mapped to 'id' string field in this model.
+  name           String // Name of the user.
+  image          String? // Profile image URL.
+  email          String?   @unique // Unique email address of the user.
+  emailVerified  DateTime? // Email verification timestamp.
+  hashedPassword String? // Hashed password of the user.
+  createdAt      DateTime  @default(now()) // Creation timestamp.
+  updatedAt      DateTime  @updatedAt // Update timestamp.
+  favoriteIds    String[]  @db.ObjectId // Array of favorite movie ids.
+  sessions       Session[] // List of user's sessions.
+  accounts       Account[] // List of user's accounts.
+}
+
+// The Account model defines the schema for accounts. 
+// Each account belongs to a user.
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId // Specifies that '_id' field from MongoDB is mapped to 'id' string field in this model.
+  userId            String  @db.ObjectId // Id of the user.
+  type              String // Type of the account.
+  provider          String // Provider of the account.
+  providerAccountId String // Provider account id.
+  refresh_token     String? @db.String // Refresh token for account authorization.
+  access_token      String? @db.String // Access token for account authorization.
+  expires_at        Int? // Timestamp when the account authorization expires.
+  token_type        String? // Type of token for account authorization.
+  scope             String? // Scope of the token.
+  id_token          String? @db.String // Account identifier token.
+  session_state     String? // Session state string.
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relationship specification mapping user id field as foreign key and Cascade ON DELETE behavior.
+
+  @@unique([provider, providerAccountId]) // Specifies uniqueness constraint on provider and providerAccountId fields.
+}
+
+// The Session model defines the schema for user sessions.
+// Each session has an associated user.
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId // Specifies that '_id' field from MongoDB is mapped to 'id' string field in this model.
+  sessionToken String   @unique // Unique session token.
+  userId       String   @db.ObjectId // Associated user id.
+  expires      DateTime // Expiration timestamp.
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relationship specification mapping user id field as foreign key and Cascade ON DELETE behavior.
+}
+
+// The VerificationToken model defines the schema for verification tokens.
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId // Specifies that '_id' field from MongoDB is mapped to 'id' string field in this model.
+  identifier String // Identifier string.
+  token      String   @unique // Unique token string.
+  expires    DateTime // Expiration timestamp.
+
+  @@unique([identifier, token]) // Specifies uniqueness constraint on identifier and token fields.
+}
+
+// The Movie model defines the schema for movie information.
+model Movie {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId // Specifies that '_id' field from MongoDB is mapped to 'id' string field in this model.
+  title        String // Title of the movie.
+  description  String // Description of the movie.
+  videoUrl     String // Video URL for the movie.
+  thumbnailUrl String // Thumbnail URL for the movie.
+  genre        String // Genre of the movie.
+  duration     String // Duration of the movie.
+}
